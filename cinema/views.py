@@ -27,6 +27,7 @@ from permissions import IsAdminOrIfAuthenticatedReadOnly
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def has_permission(self, request, view):
         return bool(
@@ -37,6 +38,7 @@ class GenreViewSet(viewsets.ModelViewSet):
 class ActorViewSet(viewsets.ModelViewSet):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def has_permission(self, request, view):
         return bool(
@@ -47,6 +49,7 @@ class ActorViewSet(viewsets.ModelViewSet):
 class CinemaHallViewSet(viewsets.ModelViewSet):
     queryset = CinemaHall.objects.all()
     serializer_class = CinemaHallSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def has_permission(self, request, view):
         return bool(
@@ -57,6 +60,7 @@ class CinemaHallViewSet(viewsets.ModelViewSet):
 class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.prefetch_related("genres", "actors")
     serializer_class = MovieSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     @staticmethod
     def _params_to_ints(qs):
@@ -110,6 +114,7 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         )
     )
     serializer_class = MovieSessionSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_queryset(self):
         date = self.request.query_params.get("date")
@@ -144,6 +149,7 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
 class OrderPagination(PageNumberPagination):
     page_size = 10
     max_page_size = 100
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def has_permission(self, request, view):
         return bool(
@@ -157,7 +163,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     )
     serializer_class = OrderSerializer
     pagination_class = OrderPagination
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly, IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)

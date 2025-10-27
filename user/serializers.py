@@ -20,12 +20,13 @@ class UserSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         password = validated_data.pop("password", None)
+        user = super().update(instance, validated_data)
 
         if password:
-            instance.set_password(password)
-            instance.save()
+            user.set_password(password)
+            user.save()
 
-        return instance
+        return user
 
     def has_permission(self, request, view):
         return bool(
