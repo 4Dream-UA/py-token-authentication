@@ -29,10 +29,7 @@ class GenreViewSet(viewsets.ModelViewSet):
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
-    def has_permission(self, request, view):
-        return bool(
-            view.action in ["list", "create"]
-        )
+    http_method_names = ["list", "create"]
 
 
 class ActorViewSet(viewsets.ModelViewSet):
@@ -40,10 +37,7 @@ class ActorViewSet(viewsets.ModelViewSet):
     serializer_class = ActorSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
-    def has_permission(self, request, view):
-        return bool(
-            view.action in ["list", "create"]
-        )
+    http_method_names = ["list", "create"]
 
 
 class CinemaHallViewSet(viewsets.ModelViewSet):
@@ -51,16 +45,14 @@ class CinemaHallViewSet(viewsets.ModelViewSet):
     serializer_class = CinemaHallSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
-    def has_permission(self, request, view):
-        return bool(
-            view.action in ["list", "create"]
-        )
+    http_method_names = ["list", "create"]
 
 
 class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.prefetch_related("genres", "actors")
     serializer_class = MovieSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    http_method_names = ["list", "create", "retrieve"]
 
     @staticmethod
     def _params_to_ints(qs):
@@ -97,11 +89,6 @@ class MovieViewSet(viewsets.ModelViewSet):
 
         return MovieSerializer
 
-    def has_permission(self, request, view):
-        return bool(
-            view.action in ["list", "create", "retrieve"]
-        )
-
 
 class MovieSessionViewSet(viewsets.ModelViewSet):
     queryset = (
@@ -115,6 +102,7 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
     )
     serializer_class = MovieSessionSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    http_method_names = ["list", "create", "retrieve", "update", "delete", "partial_update"]
 
     def get_queryset(self):
         date = self.request.query_params.get("date")
@@ -140,21 +128,13 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
 
         return MovieSessionSerializer
 
-    def has_permission(self, request, view):
-        return bool(
-            view.action in ["list", "create", "retrieve", "update", "delete", "partial_update"]
-        )
-
 
 class OrderPagination(PageNumberPagination):
     page_size = 10
     max_page_size = 100
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
-    def has_permission(self, request, view):
-        return bool(
-            view.action in ["list", "create"]
-        )
+    http_method_names = ["list", "create"]
 
 
 class OrderViewSet(viewsets.ModelViewSet):
