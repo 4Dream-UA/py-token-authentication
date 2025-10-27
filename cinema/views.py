@@ -1,8 +1,10 @@
 from datetime import datetime
 
+from django.contrib.admin import action
 from django.db.models import F, Count
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
 
@@ -19,21 +21,37 @@ from cinema.serializers import (
     OrderSerializer,
     OrderListSerializer,
 )
+from permissions import IsAdminOrIfAuthenticatedReadOnly
 
 
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
 
+    def has_permission(self, request, view):
+        return bool(
+            view.action in ["list", "create"]
+        )
+
 
 class ActorViewSet(viewsets.ModelViewSet):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
 
+    def has_permission(self, request, view):
+        return bool(
+            view.action in ["list", "create"]
+        )
+
 
 class CinemaHallViewSet(viewsets.ModelViewSet):
     queryset = CinemaHall.objects.all()
     serializer_class = CinemaHallSerializer
+
+    def has_permission(self, request, view):
+        return bool(
+            view.action in ["list", "create"]
+        )
 
 
 class MovieViewSet(viewsets.ModelViewSet):
@@ -75,6 +93,11 @@ class MovieViewSet(viewsets.ModelViewSet):
 
         return MovieSerializer
 
+    def has_permission(self, request, view):
+        return bool(
+            view.action in ["list", "create", "retrieve"]
+        )
+
 
 class MovieSessionViewSet(viewsets.ModelViewSet):
     queryset = (
@@ -112,10 +135,20 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
 
         return MovieSessionSerializer
 
+    def has_permission(self, request, view):
+        return bool(
+            view.action in ["list", "create", "retrieve", "update", "delete", "partial_update"]
+        )
+
 
 class OrderPagination(PageNumberPagination):
     page_size = 10
     max_page_size = 100
+
+    def has_permission(self, request, view):
+        return bool(
+            view.action in ["list", "create"]
+        )
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -124,6 +157,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     )
     serializer_class = OrderSerializer
     pagination_class = OrderPagination
+    permission_classes = (IsAuthenticatedOrReadOnly, )
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
