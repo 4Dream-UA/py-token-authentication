@@ -1,10 +1,9 @@
 from datetime import datetime
 
-from django.contrib.admin import action
 from django.db.models import F, Count
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
 
@@ -132,9 +131,6 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
 class OrderPagination(PageNumberPagination):
     page_size = 10
     max_page_size = 100
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
-
-    http_method_names = ["list", "create"]
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -143,7 +139,9 @@ class OrderViewSet(viewsets.ModelViewSet):
     )
     serializer_class = OrderSerializer
     pagination_class = OrderPagination
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly, IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly, IsAuthenticated,)
+
+    http_method_names = ["list", "create"]
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
